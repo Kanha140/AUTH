@@ -10,8 +10,8 @@ import hashlib
 import requests
 import json
 
-# Replace with your Bot's API server IP/Domain & Port (e.g. http://127.0.0.1:5000)
-AUTH_SERVER_URL = "http://127.0.0.1:5000"
+# Live Cloud Auth Server URL
+AUTH_SERVER_URL = "https://axenor-auth-bot.onrender.com"
 
 def get_hwid() -> str:
     """
