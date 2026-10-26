@@ -6,6 +6,7 @@ import asyncio
 
 import database
 import webhook_logger
+import db_sync
 from config import DISCORD_TOKEN, MAIN_OWNER_ID, GUILD_ID, API_HOST, API_PORT
 from panel import ResellerPanelView, create_panel_embed, can_manage_reseller
 from api import start_api_server
@@ -24,6 +25,9 @@ class AuthBot(commands.Bot):
         self.api_runner = None
 
     async def setup_hook(self):
+        # 0. Restore Database from GitHub Cloud Backup
+        await db_sync.restore_database()
+
         # 1. Initialize SQLite Database
         database.init_db()
         logger.info("Database initialized successfully.")
@@ -77,6 +81,7 @@ async def on_ready():
     activity = discord.Activity(type=discord.ActivityType.watching, name="Keys & HWID Auth")
     await bot.change_presence(status=discord.Status.online, activity=activity)
     asyncio.create_task(keep_alive_task())
+    asyncio.create_task(db_sync.periodic_db_sync_task())
 
 # ================= PERMISSION HELPERS =================
 

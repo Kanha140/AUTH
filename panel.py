@@ -3,6 +3,7 @@ from discord.ui import Modal, TextInput, View, button
 from discord import TextStyle, ButtonStyle, Embed, Interaction
 import database
 import webhook_logger
+import db_sync
 
 def can_manage_reseller(interaction: Interaction) -> bool:
     """
@@ -112,6 +113,9 @@ class CreateUserModal(Modal, title="Create User & Key"):
             channel_id=interaction.channel_id
         )
 
+        # Trigger Cloud Backup
+        db_sync.trigger_cloud_backup()
+
 
 class DeleteUserModal(Modal, title="Delete User & Key"):
     username = TextInput(
@@ -136,6 +140,7 @@ class DeleteUserModal(Modal, title="Delete User & Key"):
 
             # Webhook log
             await webhook_logger.log_key_deleted(uname, interaction.user.id, interaction.channel_id)
+            db_sync.trigger_cloud_backup()
         else:
             await interaction.response.send_message(
                 f"❌ User **`{uname}`** was not found in the database.",
@@ -175,6 +180,7 @@ class ResetHWIDModal(Modal, title="Reset User HWID"):
 
         # Webhook log
         await webhook_logger.log_hwid_reset(uname, interaction.user.id, result.get("old_hwid"))
+        db_sync.trigger_cloud_backup()
 
 
 class KeyInfoModal(Modal, title="Check Key & HWID Info"):

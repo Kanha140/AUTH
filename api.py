@@ -3,6 +3,7 @@ import logging
 from aiohttp import web
 import database
 import webhook_logger
+import db_sync
 from config import API_HOST, API_PORT
 
 logger = logging.getLogger("AuthAPI")
@@ -55,6 +56,9 @@ async def login_post(request: web.Request):
         )
     )
 
+    if result.get("status") == "HWID_BOUND_SUCCESS":
+        db_sync.trigger_cloud_backup()
+
     return web.json_response(result, status=status_code)
 
 @routes.get("/api/login")
@@ -82,6 +86,9 @@ async def login_get(request: web.Request):
             ip=client_ip
         )
     )
+
+    if result.get("status") == "HWID_BOUND_SUCCESS":
+        db_sync.trigger_cloud_backup()
 
     return web.json_response(result, status=status_code)
 
