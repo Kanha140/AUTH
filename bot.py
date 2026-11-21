@@ -1,8 +1,10 @@
+import os
 import discord
 from discord.ext import commands
 from discord import app_commands, Embed, PermissionOverwrite
 import logging
 import asyncio
+import aiohttp
 
 import database
 import webhook_logger
